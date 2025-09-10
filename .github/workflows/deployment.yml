@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: ./dist
+          path: dist
 
   deploy:
     needs: build
@@ -68,6 +68,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: dist
+          path: dist
 
       - name: List contents
         run: ls -la dist
