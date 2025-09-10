@@ -1,0 +1,64 @@
+name: Deploy Project on AWS
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Base setup
+        uses: ./.github/actions/base-setup
+
+      - name: Run linter
+        run: yarn lint
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Base setup
+        uses: ./.github/actions/base-setup
+
+      - name: Format code
+        run: yarn format
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Base setup
+        uses: ./.github/actions/base-setup
+
+      - name: Run tests
+        run: yarn test
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Base setup
+        uses: ./.github/actions/base-setup
+
+      - name: Build project
+        run: yarn build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with: 
+          name: dist
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: dist
+
+      - name: List contents
+        run: ls -la dist
+
+      - name: Run server
+        run: node dist/index.js
